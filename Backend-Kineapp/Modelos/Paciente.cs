@@ -5,8 +5,6 @@ namespace Backend_Kineapp.Modelos;
 
 public partial class Paciente
 {
- 
-
     public int IdPaciente { get; set; }
 
     public string? Nombre { get; set; }

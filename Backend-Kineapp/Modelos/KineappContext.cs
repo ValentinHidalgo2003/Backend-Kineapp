@@ -11,6 +11,7 @@ public partial class KineappContext : DbContext
         
     }
 
+
     public KineappContext(DbContextOptions<KineappContext> options)
         : base(options)
     {
@@ -79,17 +80,17 @@ public partial class KineappContext : DbContext
         {
             entity.HasKey(e => e.IdHistorial);
 
-            entity.ToTable("Historial_medico");
+            entity.ToTable("HistorialMedico");
 
             entity.Property(e => e.IdHistorial)
-                .ValueGeneratedNever()
-                .HasColumnName("Id_historial");
+                .ValueGeneratedOnAdd()
+                .HasColumnName("IdHistorial");
             entity.Property(e => e.Descripcion)
                 .HasMaxLength(100)
                 .IsUnicode(false);
             entity.Property(e => e.FechaCreacion)
                 .HasColumnType("date")
-                .HasColumnName("Fecha_creacion");
+                .HasColumnName("FechaCreacion");
             entity.Property(e => e.Nota)
                 .HasMaxLength(100)
                 .IsUnicode(false);
@@ -163,7 +164,7 @@ public partial class KineappContext : DbContext
                 .HasMaxLength(100)
                 .IsUnicode(false);
             entity.Property(e => e.FechaNacimento).HasColumnType("date");
-            entity.Property(e => e.IdHistorial).HasColumnName("Id_historial");
+            entity.Property(e => e.IdHistorial).HasColumnName("IdHistorial");
             entity.Property(e => e.IdObraSocial).HasColumnName("Id_obraSocial");
             entity.Property(e => e.IdTurno).HasColumnName("Id_turno");
             entity.Property(e => e.IdUsuario).HasColumnName("id_usuario");
@@ -176,7 +177,7 @@ public partial class KineappContext : DbContext
 
             entity.HasOne(d => d.IdHistorialNavigation).WithMany(p => p.Pacientes)
                 .HasForeignKey(d => d.IdHistorial)
-                .HasConstraintName("FK_Paciente_Historial_medico");
+                .HasConstraintName("FK_Paciente_HistorialMedico");
 
             entity.HasOne(d => d.IdObraSocialNavigation).WithMany(p => p.Pacientes)
                 .HasForeignKey(d => d.IdObraSocial)

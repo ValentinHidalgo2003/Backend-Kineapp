@@ -8,7 +8,8 @@ public partial class Usuario
     public int IdUsuario { get; set; }
 
     //public int TipoUsuario { get; set; }
-
+    public string NombreUsuario { get; set; }
+    public string Password  { get; set; }
     public int? IdPaciente { get; set; }
 
     public int? IdKinesiologo { get; set; }
