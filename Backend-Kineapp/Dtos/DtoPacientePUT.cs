@@ -2,7 +2,7 @@
 {
     public class DtoPacientePUT
     {
-
+        public int? IdPaciente { get; set; }
         public string? Nombre { get; set; }
 
         public string? Apellido { get; set; }
@@ -18,10 +18,13 @@
         public string? Telefono { get; set; }
 
         public string? Antecedentes { get; set; }
-
-        public virtual DtoHistorial? DtoIdHistorial { get; set; }
+        public int? IdHistorialMedico { get; set; }
+        public virtual DtoHistorial? historialMedico { get; set; }
         public virtual DtoObraSocial? DtoObraSocial { get; set; }
-        public virtual DtoTurno? DtoTurno { get; set; }
-        public virtual DtoUsuario? DtoUsuario { get; set; }
+        public int IdObraSocial { get; set; }
+
+        public int? IdTurno { get; set; }
+        public int? IdUsuario { get; set; }
+
     }
 }

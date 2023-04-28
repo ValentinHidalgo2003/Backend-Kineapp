@@ -28,6 +28,17 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+ void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+{
+    // Other middleware
+    app.UseRouting(); // Add UseRouting middleware
+    app.UseEndpoints(endpoints =>
+    {
+        // Configured endpoints
+        endpoints.MapControllers(); // Map API controllers
+    });
+}
+
 
 // static async Task Echo(WebSocket webSocket)
 //{
@@ -71,7 +82,7 @@ if (app.Environment.IsDevelopment())
 //await host.RunConsoleAsync();
 
 
- static IHostBuilder CreateHostBuilder(string[] args) =>
+static IHostBuilder CreateHostBuilder(string[] args) =>
     Host.CreateDefaultBuilder(args)
         .ConfigureWebHostDefaults(webBuilder =>
         {
