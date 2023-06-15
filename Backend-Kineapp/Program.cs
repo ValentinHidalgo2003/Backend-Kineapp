@@ -7,7 +7,9 @@ using Microsoft.Extensions.Hosting;
 using System.Net.WebSockets;
 using System.Net;
 using Microsoft.Extensions.Options;
-
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Mvc;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,6 +21,14 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddScoped<KineappContext>();  // INYECCION DE DEPENDENCIA  
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+    .AddCookie(option =>
+    {
+        option.LoginPath = "/api/Login/loguear";
+        option.ExpireTimeSpan = TimeSpan.FromMinutes(20);
+        option.AccessDeniedPath = "/api/Turno";
+    });
+
 
 var app = builder.Build();
 
@@ -38,50 +48,6 @@ if (app.Environment.IsDevelopment())
         endpoints.MapControllers(); // Map API controllers
     });
 }
-
-
-// static async Task Echo(WebSocket webSocket)
-//{
-//    var buffer = new byte[1024 * 4];
-//    WebSocketReceiveResult result;
-//    do
-//    {
-//        result = await webSocket.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
-//        await webSocket.SendAsync(new ArraySegment<byte>(buffer, 0, result.Count), result.MessageType, result.EndOfMessage, CancellationToken.None);
-//    } while (!result.CloseStatus.HasValue);
-//}
-
-//var host = Host.CreateDefaultBuilder(args)
-//           .ConfigureWebHostDefaults(webBuilder =>
-//           {
-//               webBuilder.Configure(app =>
-//               {
-//                   app.UseWebSockets();
-//                   app.Use(async (context, next) =>
-//                   {
-//                       if (context.WebSockets.IsWebSocketRequest)
-//                       {
-//                           using var webSocket = await context.WebSockets.AcceptWebSocketAsync();
-//                           await Echo(webSocket);
-//                           return;
-//                       }
-//                       await next();
-//                   });
-
-//                   app.UseRouting();
-//                   app.UseEndpoints(endpoints =>
-//                   {
-//                       endpoints.MapGet("/", async context =>
-//                       {
-//                           await context.Response.WriteAsync("Hello World!");
-//                       });
-//                   });
-//               });
-//           });
-
-//await host.RunConsoleAsync();
-
-
 static IHostBuilder CreateHostBuilder(string[] args) =>
     Host.CreateDefaultBuilder(args)
         .ConfigureWebHostDefaults(webBuilder =>
@@ -116,9 +82,26 @@ app.UseCors(options =>
 
 app.UseHttpsRedirection();
 
+app.UseAuthentication();
+
+
+
+//app.MapControllerRoute(
+//    name: "default",
+//    pattern : "{controller=LoginController}/{action=Index}/{id?}");
+app.UseRouting();
+
 app.UseAuthorization();
 
-app.MapControllers();
+app.UseEndpoints(endpoints =>
+{
+    endpoints.MapControllerRoute(
+        name: "login",
+        pattern: "api/Login/loguear",
+        defaults: new { controller = "Login", action = "LoginPaciente" });
+    // Otras rutas...
+});
+
 
 app.Run();
 

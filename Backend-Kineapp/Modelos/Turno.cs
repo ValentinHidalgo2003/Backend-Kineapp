@@ -12,4 +12,7 @@ public partial class Turno
     public int? IdDetalleTurno { get; set; }
 
     public virtual ICollection<Paciente> Pacientes { get; } = new List<Paciente>();
+
+    public virtual DetalleTurno? IdDetalleTurnoNavigation { get; set; }
+
 }

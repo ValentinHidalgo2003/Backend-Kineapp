@@ -10,6 +10,5 @@ namespace Backend_Kineapp.Dtos
         public string? Descripcion { get; set; }
 
         public string? Nota { get; set; }
-       // public virtual ICollection<Paciente>? Pacientes { get; } = new List<Paciente>();
     }
 }

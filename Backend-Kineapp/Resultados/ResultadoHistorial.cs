@@ -9,6 +9,6 @@ namespace Backend_Kineapp.Resultados
         public string? Descripcion { get; set; }
 
         public string? Nota { get; set; }
-       
+
     }
 }

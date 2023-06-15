@@ -11,7 +11,7 @@ public partial class MedioPago
 
     public bool? Activo { get; set; }
 
-    public int? IdDetalleTurno { get; set; }
+    //public int? IdDetalleTurno { get; set; }
 
     public virtual ICollection<DetalleTurno> DetalleTurnos { get; } = new List<DetalleTurno>();
 }

@@ -8,7 +8,7 @@ public partial class KineappContext : DbContext
 {
     public KineappContext()
     {
-        
+
     }
 
 
@@ -36,6 +36,9 @@ public partial class KineappContext : DbContext
     public virtual DbSet<Turno> Turnos { get; set; }
 
     public virtual DbSet<Usuario> Usuarios { get; set; }
+    public virtual DbSet<Rol> Rol { get; set; }
+    public virtual DbSet<Permiso> Permisos { get; set; }
+    public virtual DbSet<RolesPermisos> RolesPermisos { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
@@ -50,18 +53,23 @@ public partial class KineappContext : DbContext
             entity.ToTable("Detalle_turno");
 
             entity.Property(e => e.IdDetalle)
-                .ValueGeneratedNever()
+                .ValueGeneratedOnAdd()
                 .HasColumnName("Id_detalle");
             entity.Property(e => e.Fecha).HasColumnType("date");
             entity.Property(e => e.HoraInicio).HasPrecision(0);
             entity.Property(e => e.IdKinesiologo).HasColumnName("id_kinesiologo");
             entity.Property(e => e.IdMedioPago).HasColumnName("id_medio_pago");
             entity.Property(e => e.IdObraSocial).HasColumnName("id_obra_social");
+            entity.Property(e => e.IdPaciente).HasColumnName("id_paciente");
             entity.Property(e => e.IdTratamiento).HasColumnName("id_tratamiento");
 
             entity.HasOne(d => d.IdKinesiologoNavigation).WithMany(p => p.DetalleTurnos)
                 .HasForeignKey(d => d.IdKinesiologo)
                 .HasConstraintName("FK_Detalle_turno_Kinesiologo1");
+            
+            entity.HasOne(d => d.IdPacienteNavigation).WithMany(p => p.DetalleTurnos)
+                .HasForeignKey(d => d.IdPaciente)
+                .HasConstraintName("FK_Detalle_turno_Paciente");
 
             entity.HasOne(d => d.IdMedioPagoNavigation).WithMany(p => p.DetalleTurnos)
                 .HasForeignKey(d => d.IdMedioPago)
@@ -130,7 +138,7 @@ public partial class KineappContext : DbContext
             entity.ToTable("Medio_pago");
 
             entity.Property(e => e.IdMedio).HasColumnName("Id_medio");
-            entity.Property(e => e.IdDetalleTurno).HasColumnName("id_detalle_turno");
+            //entity.Property(e => e.IdDetalleTurno).HasColumnName("id_detalle_turno");
             entity.Property(e => e.TipoMedioPago).HasColumnName("tipo_medio_pago");
         });
 
@@ -241,6 +249,11 @@ public partial class KineappContext : DbContext
             entity.Property(e => e.Nota)
                 .HasMaxLength(50)
                 .IsUnicode(false);
+
+            entity.HasOne(d => d.IdDetalleTurnoNavigation).WithMany(p => p.Turnos)
+               .HasForeignKey(d => d.IdDetalleTurno)
+               .HasConstraintName("FK_Turno_HistorialMedico");
+
         });
 
         modelBuilder.Entity<Usuario>(entity =>
@@ -250,13 +263,88 @@ public partial class KineappContext : DbContext
             entity.ToTable("Usuario");
 
             entity.Property(e => e.IdUsuario).HasColumnName("Id_usuario");
-            entity.Property(e => e.IdKinesiologo).HasColumnName("id_kinesiologo");
-            entity.Property(e => e.IdPaciente).HasColumnName("id_paciente");
-            //entity.Property(e => e.TipoUsuario).HasColumnName("Tipo_usuario");
+            entity.Property(e => e.NombreUsuario).HasColumnName("NombreUsuario");
+            entity.Property(e => e.Password).HasColumnName("Password");
+            entity.Property(e => e.IdRol).HasColumnName("id_rol");
+
+            entity.HasOne(d => d.IdRolNavigation).WithMany(p => p.Usuarios)
+              .HasForeignKey(d => d.IdRol)
+              .HasConstraintName("FK_Usuario_Rol");
         });
+
+        modelBuilder.Entity<RolesPermisos>(entity =>
+        {
+            entity.HasKey(e => e.IdRolPermiso);
+
+            entity.Property(e => e.IdRolPermiso)
+                .HasColumnName("IdRolPermiso")
+                .ValueGeneratedOnAdd();
+
+            entity.Property(e => e.IdRol).HasColumnName("IdRol");
+
+            entity.Property(e => e.IdPermiso).HasColumnName("IdPermiso");
+
+            entity.Property(e => e.Estado).HasColumnName("Estado");
+
+            entity.HasOne(d => d.IdRolNavigation)
+                .WithMany(p => p.RolesPermisos)
+                .HasForeignKey(d => d.IdRol)
+                .HasConstraintName("FK_RolesPermisos_Rol");
+
+            entity.HasOne(d => d.IdPermisoNavigation)
+                .WithMany(p => p.RolesPermisos)
+                .HasForeignKey(d => d.IdPermiso)
+                .HasConstraintName("FK_RolesPermisos_Permiso");
+        });
+
+        modelBuilder.Entity<Permiso>(entity =>
+        {
+            entity.HasKey(e => e.IdPermiso);
+
+            entity.Property(e => e.IdPermiso)
+                .HasColumnName("IdPermiso")
+                .ValueGeneratedOnAdd();
+
+            entity.Property(e => e.Descripcion)
+                .HasColumnName("Descripcion")
+                .HasMaxLength(255);
+
+            entity.HasMany(d => d.RolesPermisos)
+                .WithOne(p => p.IdPermisoNavigation)
+                .HasForeignKey(d => d.IdPermiso)
+                .HasConstraintName("FK_RolesPermisos_Permiso");
+        });
+
+
+
+        modelBuilder.Entity<Rol>(entity =>
+        {
+            entity.HasKey(e => e.IdRol);
+
+            entity.Property(e => e.IdRol)
+                .HasColumnName("id_rol")
+                .ValueGeneratedOnAdd();
+
+            entity.Property(e => e.Nombre)
+                .HasColumnName("Nombre")
+                .HasMaxLength(255);
+
+            entity.HasMany(d => d.Usuarios)
+                .WithOne(p => p.IdRolNavigation)
+                .HasForeignKey(d => d.IdRol)
+                .HasConstraintName("FK_Usuarios_Rol");
+
+            entity.HasMany(d => d.RolesPermisos)
+                .WithOne(p => p.IdRolNavigation)
+                .HasForeignKey(d => d.IdRol)
+                .HasConstraintName("FK_RolesPermisos_Rol");
+        });
+
 
         OnModelCreatingPartial(modelBuilder);
     }
+
+
 
     partial void OnModelCreatingPartial(ModelBuilder modelBuilder);
 }
