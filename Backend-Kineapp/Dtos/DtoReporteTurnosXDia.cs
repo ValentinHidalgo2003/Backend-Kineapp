@@ -40,7 +40,5 @@ namespace Backend_Kineapp.Dtos
                 return -1;
             }
         }
-
-
     }
 }

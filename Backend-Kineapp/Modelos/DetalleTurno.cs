@@ -9,7 +9,7 @@ public partial class DetalleTurno
 {
     public int IdDetalle { get; set; }
 
-    public DateTime? Fecha { get; set; }
+    public DateTime Fecha { get; set; }
 
     public TimeSpan? HoraInicio { get; set; }
 

@@ -38,7 +38,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
- void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+void Configure(IApplicationBuilder app, IWebHostEnvironment env)
 {
     // Other middleware
     app.UseRouting(); // Add UseRouting middleware

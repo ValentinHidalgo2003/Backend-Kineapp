@@ -90,27 +90,25 @@ namespace Backend_Kineapp.Controllers
             return turnosAtendidos;
         }
 
-        [HttpGet("api/Reporte/TurnosXSemana")]
-        public IActionResult ObtenerTurnosSemanalesPorDia()
+        [HttpGet("api/Reporte/TurnosPorDiaSemana")]
+        public ActionResult<Dictionary<string, int>> GetTurnosPorDiaSemana()
         {
             try
             {
-                string[] diasSemana = { "lunes", "martes", "miércoles", "jueves", "viernes", "sábado", "domingo" };
-                var turnosPorDia = new Dictionary<string, int>();
+                var turnosPorDiaSemana = _context.DetalleTurnos
+                    .AsEnumerable()
+                    .GroupBy(t => t.Fecha.DayOfWeek.ToString())
+                    .ToDictionary(g => g.Key, g => g.Count());
 
-                foreach (var diaSemana in diasSemana)
-                {
-                    int turnosAtendidos = _obtenerTurnosAtendidosPorDiaSemana.ObtenerTurnosAtendidos(diaSemana);
-                    turnosPorDia[diaSemana] = turnosAtendidos;
-                }
 
-                return Ok(turnosPorDia);
+                return turnosPorDiaSemana;
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.Message);
-                return StatusCode(500, "Error interno del servidor");
+                return BadRequest(ex.Message);
             }
         }
+
+
     }
 }

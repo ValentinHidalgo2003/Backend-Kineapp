@@ -141,10 +141,24 @@ namespace Backend_Kineapp.Controllers
         [HttpDelete("api/Paciente/Delete/{id}")]
         public async Task<ActionResult> Delete(int id)
         {
+            var detalleTurno = await _context.DetalleTurnos
+                .Include(dt => dt.Turnos) // Incluir la relación con la tabla Turno
+                .Where(dt => dt.IdPaciente == id)
+                .ToListAsync();
+
+            // Eliminar los registros relacionados en la tabla Turno
+            foreach (var dt in detalleTurno)
+            {
+                _context.Turnos.RemoveRange(dt.Turnos);
+            }
+
+            // Eliminar los registros en la tabla Detalle_turno
+            _context.DetalleTurnos.RemoveRange(detalleTurno);
+
             var paciente = await _context.Pacientes.FindAsync(id);
             if (paciente == null)
             {
-                return NotFound($"No se encontro el paciente con el Id {id}");
+                return NotFound($"No se encontró el paciente con el Id {id}");
             }
             _context.Pacientes.Remove(paciente);
             await _context.SaveChangesAsync();
